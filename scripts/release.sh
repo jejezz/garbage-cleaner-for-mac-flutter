@@ -5,6 +5,10 @@
 #   SIGNING_IDENTITY="Developer ID Application: Your Name (TEAMID)" \
 #   NOTARY_PROFILE=macbroom ./scripts/release.sh   # signed + notarized + stapled
 #
+# BUILD_NUMBER=<n> overrides the build number (CFBundleVersion) instead of the
+# one baked into pubspec.yaml — used by .github/workflows/release-macos.yml's
+# manual "Run workflow" input.
+#
 # One-time setup for notarization (needs an Apple Developer Program account):
 #   xcrun notarytool store-credentials macbroom \
 #       --apple-id you@example.com --team-id TEAMID --password <app-specific-password>
@@ -23,7 +27,11 @@ ENTITLEMENTS="macos/Runner/Release.entitlements"
 step() { printf '\n\033[1;35m▶ %s\033[0m\n' "$*"; }
 
 step "Build $APP_NAME $VERSION (release)"
-flutter build macos --release
+if [[ -n "${BUILD_NUMBER:-}" ]]; then
+  flutter build macos --release --build-number="$BUILD_NUMBER"
+else
+  flutter build macos --release
+fi
 
 step "Sign"
 if [[ -n "${SIGNING_IDENTITY:-}" ]]; then
