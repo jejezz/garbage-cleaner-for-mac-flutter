@@ -1,0 +1,67 @@
+name: Release · macOS
+
+# Builds MacBroom with scripts/release.sh (ad-hoc signed by default — no
+# Apple Developer Program account configured yet) and uploads the .dmg/.zip
+# as a workflow artifact. On a `v*` tag push it also opens a draft GitHub
+# Release with the build attached, automating steps 2-4 of docs/RELEASE.md.
+#
+# See docs/RELEASE.md for the Developer ID + notarization variant and what
+# it would take to wire that into this workflow.
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      build_number:
+        description: "Override the build number (CFBundleVersion). Leave empty to use pubspec.yaml."
+        required: false
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    # A recent macOS runner keeps the default Xcode SDK new enough for plugins
+    # that reference newer SDK APIs.
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Install Flutter dependencies
+        run: flutter pub get
+
+      - name: Build & package
+        env:
+          BUILD_NUMBER: ${{ github.event.inputs.build_number }}
+        run: ./scripts/release.sh
+
+      - name: Read version from pubspec.yaml
+        id: version
+        run: |
+          echo "version=$(sed -n 's/^version: *\([0-9.]*\).*/\1/p' pubspec.yaml)" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MacBroom-${{ steps.version.outputs.version }}
+          path: dist/*
+
+      - name: Draft GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cd dist
+          NOTES=$(printf '## Checksums (SHA-256)\n```\n%s\n```\n' "$(shasum -a 256 *.dmg *.zip)")
+          gh release create "${{ github.ref_name }}" *.dmg *.zip \
+            --repo "${{ github.repository }}" \
+            --draft \
+            --title "MacBroom ${{ steps.version.outputs.version }}" \
+            --notes "$NOTES"

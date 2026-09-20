@@ -2,6 +2,36 @@
 
 How a MacBroom version goes from source to a GitHub Release.
 
+## Option A — GitHub Actions (recommended)
+
+[`.github/workflows/release-macos.yml`](../.github/workflows/release-macos.yml) runs
+`scripts/release.sh` on a `macos-26` runner and does steps 2-4 below for you:
+
+```bash
+git tag -a v1.0.2 -m "MacBroom 1.0.2"
+git push --follow-tags
+```
+
+Pushing a `v*` tag builds the ad-hoc signed `.dmg`/`.zip`, uploads them as a workflow
+artifact, and opens a **draft** GitHub Release with the checksums already filled in.
+Open the draft, fill in "What's new" (see the template in step 4 below), and publish it.
+
+You can also run it without tagging — Actions tab → **Release · macOS** → **Run
+workflow** — to sanity-check a build; that mode only uploads the artifact, no tag or
+release is created. Its `build_number` input overrides the one in `pubspec.yaml` (useful
+when you need a throwaway build without bumping the real version).
+
+The workflow has no Apple Developer Program secrets configured, so it always produces
+an ad-hoc signed build, same as running `scripts/release.sh` locally with no
+`SIGNING_IDENTITY`. Wiring in Developer ID signing + notarization would mean: importing
+a `.p12` certificate into a temporary keychain, exposing it as `SIGNING_IDENTITY`, and
+calling `xcrun notarytool submit` with an App Store Connect API key or app-specific
+password instead of a local `--keychain-profile` (`scripts/release.sh` already accepts
+`SIGNING_IDENTITY`/`NOTARY_PROFILE`, so the workflow only needs the keychain setup step
+added — do this once an Apple Developer Program account exists).
+
+## Option B — local build
+
 ## 1. Bump the version
 
 Edit `pubspec.yaml` — the build number (`+N`) must increase every time:
