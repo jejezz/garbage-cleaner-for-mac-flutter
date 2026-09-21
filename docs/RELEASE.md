@@ -4,31 +4,34 @@ How a MacBroom version goes from source to a GitHub Release.
 
 ## Option A — GitHub Actions (recommended)
 
-[`.github/workflows/release-macos.yml`](../.github/workflows/release-macos.yml) runs
-`scripts/release.sh` on a `macos-26` runner and does steps 2-4 below for you:
+[`.github/workflows/release-macos.yml`](../.github/workflows/release-macos.yml) — adapted
+from [jejezz/application-release-templates](https://github.com/jejezz/application-release-templates)'
+`desktop/` template — builds, signs, notarizes and publishes for you:
 
 ```bash
 git tag -a v1.0.2 -m "MacBroom 1.0.2"
 git push --follow-tags
 ```
 
-Pushing a `v*` tag builds the ad-hoc signed `.dmg`/`.zip`, uploads them as a workflow
-artifact, and opens a **draft** GitHub Release with the checksums already filled in.
-Open the draft, fill in "What's new" (see the template in step 4 below), and publish it.
+Pushing a `v1.2.3`-style tag (needs the full `major.minor.patch`, matching the
+`v*.*.*` trigger) runs `build-macos`, which builds the app, signs it with the
+Developer ID Application certificate (Hardened Runtime + `Release.entitlements`),
+packages it into a DMG with `create-dmg`, and notarizes + staples it with
+`notarytool`. The `release` job then downloads that DMG and publishes it as a
+**public** GitHub Release (`gh release create ... --generate-notes`) — no draft
+step, and release notes are auto-generated from merged PRs/commits since the
+last tag. Edit them afterward with `gh release edit v1.2.3 --notes-file notes.md`
+if you want the curated write-up from the template in step 4 below.
 
-You can also run it without tagging — Actions tab → **Release · macOS** → **Run
-workflow** — to sanity-check a build; that mode only uploads the artifact, no tag or
-release is created. Its `build_number` input overrides the one in `pubspec.yaml` (useful
-when you need a throwaway build without bumping the real version).
+Required secrets (already registered in this repo): `MACOS_CERTIFICATE_P12_BASE64`,
+`MACOS_CERTIFICATE_PASSWORD`, `MACOS_KEYCHAIN_PASSWORD`, `APPLE_ID`,
+`APPLE_ID_PASSWORD` (an app-specific password from appleid.apple.com, not the
+account password), `APPLE_TEAM_ID`.
 
-The workflow has no Apple Developer Program secrets configured, so it always produces
-an ad-hoc signed build, same as running `scripts/release.sh` locally with no
-`SIGNING_IDENTITY`. Wiring in Developer ID signing + notarization would mean: importing
-a `.p12` certificate into a temporary keychain, exposing it as `SIGNING_IDENTITY`, and
-calling `xcrun notarytool submit` with an App Store Connect API key or app-specific
-password instead of a local `--keychain-profile` (`scripts/release.sh` already accepts
-`SIGNING_IDENTITY`/`NOTARY_PROFILE`, so the workflow only needs the keychain setup step
-added — do this once an Apple Developer Program account exists).
+Because the app is now notarized, the "not notarized" install caveat in the release
+notes template below (step 4) and the ad-hoc quarantine/Full-Disk-Access caveat no
+longer apply to CI-built releases — they're still accurate for ad-hoc local builds
+(Option B without `SIGNING_IDENTITY`).
 
 ## Option B — local build
 
