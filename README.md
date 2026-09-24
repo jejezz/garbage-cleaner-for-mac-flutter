@@ -123,9 +123,9 @@ No other code changes are needed.
 
 ## Release / Distribution
 
-Push a `v*` tag and [.github/workflows/release-macos.yml](.github/workflows/release-macos.yml)
-builds the `.dmg`/`.zip` and opens a draft GitHub Release for you. Step-by-step checklist,
-including the local build path: [docs/RELEASE.md](docs/RELEASE.md).
+Push a `v1.2.3`-style tag and [.github/workflows/release-macos.yml](.github/workflows/release-macos.yml)
+builds, Developer-ID-signs, notarizes, and publishes the `.dmg` as a GitHub Release for
+you. Step-by-step checklist, including the local build path: [docs/RELEASE.md](docs/RELEASE.md).
 
 ```bash
 ./scripts/release.sh
