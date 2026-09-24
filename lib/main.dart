@@ -73,7 +73,6 @@ class App extends StatefulWidget {
 class _AppState extends State<App> with TrayListener, WindowListener {
   final state = AppState();
   final _navigatorKey = GlobalKey<NavigatorState>();
-  int page = 0;
 
   /// True while the window was opened from the tray icon: then it behaves like
   /// a popover and dismisses on blur. At launch (or after "Open" from the menu)
@@ -192,58 +191,81 @@ class _AppState extends State<App> with TrayListener, WindowListener {
         data: aboutMaterialTheme(seed: Broom.violet, surface: Broom.bg1),
         child: child!,
       ),
-      home: ListenableBuilder(
-        listenable: state,
-        builder: (context, _) => DefaultTextStyle(
-          style: Broom.body,
-          child: Container(
-            decoration: const BoxDecoration(gradient: Broom.bgGradient),
-            child: Stack(
-              children: [
-                // Ambient color blobs behind the glass
-                const Positioned(top: -120, right: -80, child: _Blob(color: Broom.violet, size: 360)),
-                const Positioned(bottom: -140, left: 60, child: _Blob(color: Broom.cyan, size: 320)),
-                Row(
-                  children: [
-                    NavRail(
-                      index: page,
-                      onChanged: (i) => setState(() => page = i),
-                      items: const [
-                        NavItem(icon: CupertinoIcons.chart_pie_fill, label: 'Disk'),
-                        NavItem(icon: CupertinoIcons.sparkles, label: 'Junk'),
-                        NavItem(icon: CupertinoIcons.square_grid_2x2_fill, label: 'Apps'),
-                      ],
-                      onAbout: _showAbout,
-                      onHide: _hide,
-                      onQuit: () => exit(0),
-                    ),
-                    Expanded(
-                      child: AnimatedSwitcher(
-                        duration: const Duration(milliseconds: 260),
-                        switchInCurve: Curves.easeOutCubic,
-                        transitionBuilder: (child, anim) => FadeTransition(
-                          opacity: anim,
-                          child: SlideTransition(
-                            position: Tween(begin: const Offset(0, 0.02), end: Offset.zero).animate(anim),
-                            child: child,
-                          ),
-                        ),
-                        child: KeyedSubtree(
-                          key: ValueKey(page),
-                          child: switch (page) {
-                            0 => DashboardPage(state: state, onGoToJunk: () => setState(() => page = 1), onGoToApps: () => setState(() => page = 2)),
-                            1 => JunkPage(state: state),
-                            _ => AppsPage(state: state),
-                          },
+      // The shell owns the page index: `home` is built once into the root
+      // route, so state kept here would not reach it on setState.
+      home: _Shell(state: state, onAbout: _showAbout, onHide: _hide),
+    );
+  }
+}
+
+/// Everything inside the window: nav rail, current page, "freed" overlay.
+class _Shell extends StatefulWidget {
+  const _Shell({required this.state, required this.onAbout, required this.onHide});
+  final AppState state;
+  final VoidCallback onAbout;
+  final VoidCallback onHide;
+
+  @override
+  State<_Shell> createState() => _ShellState();
+}
+
+class _ShellState extends State<_Shell> {
+  int page = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    final state = widget.state;
+    return ListenableBuilder(
+      listenable: state,
+      builder: (context, _) => DefaultTextStyle(
+        style: Broom.body,
+        child: Container(
+          decoration: const BoxDecoration(gradient: Broom.bgGradient),
+          child: Stack(
+            children: [
+              // Ambient color blobs behind the glass
+              const Positioned(top: -120, right: -80, child: _Blob(color: Broom.violet, size: 360)),
+              const Positioned(bottom: -140, left: 60, child: _Blob(color: Broom.cyan, size: 320)),
+              Row(
+                children: [
+                  NavRail(
+                    index: page,
+                    onChanged: (i) => setState(() => page = i),
+                    items: const [
+                      NavItem(icon: CupertinoIcons.chart_pie_fill, label: 'Disk'),
+                      NavItem(icon: CupertinoIcons.sparkles, label: 'Junk'),
+                      NavItem(icon: CupertinoIcons.square_grid_2x2_fill, label: 'Apps'),
+                    ],
+                    onAbout: widget.onAbout,
+                    onHide: widget.onHide,
+                    onQuit: () => exit(0),
+                  ),
+                  Expanded(
+                    child: AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 260),
+                      switchInCurve: Curves.easeOutCubic,
+                      transitionBuilder: (child, anim) => FadeTransition(
+                        opacity: anim,
+                        child: SlideTransition(
+                          position: Tween(begin: const Offset(0, 0.02), end: Offset.zero).animate(anim),
+                          child: child,
                         ),
                       ),
+                      child: KeyedSubtree(
+                        key: ValueKey(page),
+                        child: switch (page) {
+                          0 => DashboardPage(state: state, onGoToJunk: () => setState(() => page = 1), onGoToApps: () => setState(() => page = 2)),
+                          1 => JunkPage(state: state),
+                          _ => AppsPage(state: state),
+                        },
+                      ),
                     ),
-                  ],
-                ),
-                if (state.lastFreed != null)
-                  Positioned.fill(child: FreedOverlay(bytes: state.lastFreed!, onDone: state.dismissFreed)),
-              ],
-            ),
+                  ),
+                ],
+              ),
+              if (state.lastFreed != null)
+                Positioned.fill(child: FreedOverlay(bytes: state.lastFreed!, onDone: state.dismissFreed)),
+            ],
           ),
         ),
       ),
