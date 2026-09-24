@@ -7,6 +7,7 @@ import 'package:tray_manager/tray_manager.dart';
 import 'package:window_manager/window_manager.dart';
 
 import 'core/app_state.dart';
+import 'core/native_bridge.dart';
 import 'features/apps/apps_page.dart';
 import 'features/dashboard/dashboard_page.dart';
 import 'features/junk/junk_page.dart';
@@ -39,14 +40,18 @@ Future<void> main() async {
     },
   );
 
+  await _setUpTray();
+
+  runApp(const App());
+}
+
+Future<void> _setUpTray() async {
   await trayManager.setIcon('assets/tray/tray_icon.png', isTemplate: true);
   await trayManager.setContextMenu(Menu(items: [
     MenuItem(key: 'open', label: 'Open $appName'),
     MenuItem.separator(),
     MenuItem(key: 'quit', label: 'Quit $appName'),
   ]));
-
-  runApp(const App());
 }
 
 class App extends StatefulWidget {
@@ -70,6 +75,7 @@ class _AppState extends State<App> with TrayListener, WindowListener {
     super.initState();
     trayManager.addListener(this);
     windowManager.addListener(this);
+    NativeBridge.onReopen(_onReopen);
     state.refreshDisk();
   }
 
@@ -115,6 +121,21 @@ class _AppState extends State<App> with TrayListener, WindowListener {
     } else {
       await _showUnderTray();
     }
+  }
+
+  /// The app was launched again while running. The tray icon may have been
+  /// dropped by the system (it happens after long uptimes), and setIcon alone
+  /// reuses the dead status item — so destroy and recreate it, then show.
+  /// Centered like at launch: a freshly created status item has no real
+  /// position yet, so its bounds would put the window off screen.
+  Future<void> _onReopen() async {
+    await trayManager.destroy();
+    await _setUpTray();
+    popoverMode = false;
+    await windowManager.center();
+    await windowManager.show();
+    await windowManager.focus();
+    state.refreshDisk();
   }
 
   Future<void> _showUnderTray({bool popover = true}) async {

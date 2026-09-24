@@ -33,6 +33,13 @@ class NativeBridge {
     );
   }
 
+  /// Called when the app is launched again while already running.
+  static void onReopen(void Function() callback) {
+    _ch.setMethodCallHandler((call) async {
+      if (call.method == 'reopen') callback();
+    });
+  }
+
   static Future<void> revealInFinder(String path) =>
       _ch.invokeMethod('revealInFinder', {'path': path});
 }
