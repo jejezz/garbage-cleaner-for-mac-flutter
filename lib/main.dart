@@ -6,6 +6,7 @@ import 'package:macos_ui/macos_ui.dart';
 import 'package:tray_manager/tray_manager.dart';
 import 'package:window_manager/window_manager.dart';
 
+import 'app_identity.dart';
 import 'core/app_state.dart';
 import 'core/native_bridge.dart';
 import 'features/apps/apps_page.dart';
@@ -15,7 +16,6 @@ import 'theme/broom_theme.dart';
 import 'widgets/freed_overlay.dart';
 import 'widgets/nav_rail.dart';
 
-const appName = 'MacBroom';
 const _windowSize = Size(820, 560);
 
 Future<void> main() async {
@@ -48,9 +48,9 @@ Future<void> main() async {
 Future<void> _setUpTray() async {
   await trayManager.setIcon('assets/tray/tray_icon.png', isTemplate: true);
   await trayManager.setContextMenu(Menu(items: [
-    MenuItem(key: 'open', label: 'Open $appName'),
+    MenuItem(key: 'open', label: 'Open ${AppIdentity.displayName}'),
     MenuItem.separator(),
-    MenuItem(key: 'quit', label: 'Quit $appName'),
+    MenuItem(key: 'quit', label: 'Quit ${AppIdentity.displayName}'),
   ]));
 }
 
@@ -156,7 +156,7 @@ class _AppState extends State<App> with TrayListener, WindowListener {
   @override
   Widget build(BuildContext context) {
     return MacosApp(
-      title: appName,
+      title: AppIdentity.displayName,
       debugShowCheckedModeBanner: false,
       theme: MacosThemeData.dark(),
       darkTheme: MacosThemeData.dark(),
