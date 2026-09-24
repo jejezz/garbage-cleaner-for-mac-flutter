@@ -72,6 +72,7 @@ class _RailButton extends StatefulWidget {
 }
 
 class _RailButtonState extends State<_RailButton> {
+  static const _fade = Duration(milliseconds: 180);
   bool hover = false;
 
   @override
@@ -89,18 +90,38 @@ class _RailButtonState extends State<_RailButton> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              AnimatedContainer(
-                duration: const Duration(milliseconds: 180),
-                curve: Curves.easeOut,
+              // The active pill fades in and out as its own layer: animating one
+              // BoxDecoration between gradient and plain color jumps at both ends
+              // and reads as flicker.
+              SizedBox(
                 width: 44,
                 height: 44,
-                decoration: BoxDecoration(
-                  gradient: active ? Broom.accentGradient : null,
-                  color: active ? null : (hover ? Broom.glass : const Color(0x00000000)),
-                  borderRadius: BorderRadius.circular(13),
-                  boxShadow: active ? Broom.glow(Broom.violet, blur: 20, alpha: 0.6) : null,
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    AnimatedContainer(
+                      duration: _fade,
+                      curve: Curves.easeOut,
+                      decoration: BoxDecoration(
+                        color: hover && !active ? Broom.glass : const Color(0x00000000),
+                        borderRadius: BorderRadius.circular(13),
+                      ),
+                    ),
+                    AnimatedOpacity(
+                      duration: _fade,
+                      curve: Curves.easeOut,
+                      opacity: active ? 1 : 0,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          gradient: Broom.accentGradient,
+                          borderRadius: BorderRadius.circular(13),
+                          boxShadow: Broom.glow(Broom.violet, blur: 20, alpha: 0.6),
+                        ),
+                      ),
+                    ),
+                    Icon(widget.item.icon, size: 19, color: fg),
+                  ],
                 ),
-                child: Icon(widget.item.icon, size: 19, color: fg),
               ),
               const SizedBox(height: 4),
               Text(widget.item.label, style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: fg)),
