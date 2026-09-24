@@ -8,10 +8,18 @@ import FlutterMacOS
 /// Adding a new method = add a `case "name":` here + a Dart wrapper. That's it.
 class NativeBridge {
   static let channelName = "garbage_cleaner/native"
+  private static var channel: FlutterMethodChannel?
 
   static func register(with messenger: FlutterBinaryMessenger) {
     let channel = FlutterMethodChannel(name: channelName, binaryMessenger: messenger)
     channel.setMethodCallHandler(handle)
+    self.channel = channel
+  }
+
+  // Swift -> Dart: the app was launched again while already running (Finder,
+  // Spotlight, `open`). Dart rebuilds the tray icon and shows the window.
+  static func notifyReopen() {
+    channel?.invokeMethod("reopen", arguments: nil)
   }
 
   private static func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
