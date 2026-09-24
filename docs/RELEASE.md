@@ -34,15 +34,13 @@ added — do this once an Apple Developer Program account exists).
 
 ## 1. Bump the version
 
-Edit `pubspec.yaml` — the build number (`+N`) must increase every time:
-
-```yaml
-version: 1.0.2+3
-```
-
 ```bash
-git commit -am "Bump version to 1.0.2"
+scripts/bump-version.sh patch   # 1.0.3+4 -> 1.0.4+5, commits "chore(release): v1.0.4"
 ```
+
+`minor`, `major`, `build` or an explicit `1.1.0-rc.1` work too. The build number
+(`+N`) always goes up by one and never resets. The script doesn't tag — tag the
+merge commit on `main` after the PR lands.
 
 ## 2. Build the package
 
