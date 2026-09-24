@@ -1,21 +1,25 @@
 import 'dart:io';
+import 'dart:ui' show PlatformDispatcher;
 
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart' show ThemeMode;
+import 'package:flutter/material.dart' show Theme, ThemeMode;
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:macos_ui/macos_ui.dart';
 import 'package:tray_manager/tray_manager.dart';
 import 'package:window_manager/window_manager.dart';
 
+import 'about/macbroom_about.dart';
+import 'app_identity.dart';
 import 'core/app_state.dart';
 import 'core/native_bridge.dart';
 import 'features/apps/apps_page.dart';
 import 'features/dashboard/dashboard_page.dart';
 import 'features/junk/junk_page.dart';
+import 'l10n/app_localizations.dart';
 import 'theme/broom_theme.dart';
 import 'widgets/freed_overlay.dart';
 import 'widgets/nav_rail.dart';
 
-const appName = 'MacBroom';
 const _windowSize = Size(820, 560);
 
 Future<void> main() async {
@@ -46,11 +50,16 @@ Future<void> main() async {
 }
 
 Future<void> _setUpTray() async {
+  // The tray menu lives outside the widget tree, so resolve the locale here.
+  final l10n = lookupAppLocalizations(
+    resolveAppLocale(PlatformDispatcher.instance.locale, AppLocalizations.supportedLocales),
+  );
   await trayManager.setIcon('assets/tray/tray_icon.png', isTemplate: true);
   await trayManager.setContextMenu(Menu(items: [
-    MenuItem(key: 'open', label: 'Open $appName'),
+    MenuItem(key: 'open', label: 'Open ${AppIdentity.displayName}'),
+    MenuItem(key: 'about', label: l10n.aboutMenuItem(AppIdentity.displayName)),
     MenuItem.separator(),
-    MenuItem(key: 'quit', label: 'Quit $appName'),
+    MenuItem(key: 'quit', label: 'Quit ${AppIdentity.displayName}'),
   ]));
 }
 
@@ -63,6 +72,7 @@ class App extends StatefulWidget {
 
 class _AppState extends State<App> with TrayListener, WindowListener {
   final state = AppState();
+  final _navigatorKey = GlobalKey<NavigatorState>();
   int page = 0;
 
   /// True while the window was opened from the tray icon: then it behaves like
@@ -99,6 +109,8 @@ class _AppState extends State<App> with TrayListener, WindowListener {
     switch (item.key) {
       case 'open':
         _showUnderTray(popover: false);
+      case 'about':
+        _showAboutFromTray();
       case 'quit':
         exit(0);
     }
@@ -151,16 +163,35 @@ class _AppState extends State<App> with TrayListener, WindowListener {
     state.refreshDisk();
   }
 
+  Future<void> _showAboutFromTray() async {
+    await _showUnderTray(popover: false);
+    _showAbout();
+  }
+
+  void _showAbout() {
+    final context = _navigatorKey.currentContext;
+    if (context != null) showMacBroomAbout(context);
+  }
+
   // ── UI ───────────────────────────────────────────────────────────────────
 
   @override
   Widget build(BuildContext context) {
     return MacosApp(
-      title: appName,
+      navigatorKey: _navigatorKey,
+      title: AppIdentity.displayName,
       debugShowCheckedModeBanner: false,
       theme: MacosThemeData.dark(),
       darkTheme: MacosThemeData.dark(),
       themeMode: ThemeMode.dark,
+      localizationsDelegates: const [AppLocalizations.delegate, ...GlobalMaterialLocalizations.delegates],
+      supportedLocales: AppLocalizations.supportedLocales,
+      localeResolutionCallback: resolveAppLocale,
+      // The About dialog and licenses page are Material widgets.
+      builder: (context, child) => Theme(
+        data: aboutMaterialTheme(seed: Broom.violet, surface: Broom.bg1),
+        child: child!,
+      ),
       home: ListenableBuilder(
         listenable: state,
         builder: (context, _) => DefaultTextStyle(
@@ -182,6 +213,7 @@ class _AppState extends State<App> with TrayListener, WindowListener {
                         NavItem(icon: CupertinoIcons.sparkles, label: 'Junk'),
                         NavItem(icon: CupertinoIcons.square_grid_2x2_fill, label: 'Apps'),
                       ],
+                      onAbout: _showAbout,
                       onHide: _hide,
                       onQuit: () => exit(0),
                     ),
