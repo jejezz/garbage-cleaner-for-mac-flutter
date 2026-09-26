@@ -7,7 +7,7 @@
   "commonClose": "Close",
   "aboutMenuItem": "About {appName}",
   "aboutTagline": "A free, open-source cleaner for macOS",
-  "aboutDescription": "A one-click menubar app that clears caches and developer junk, uninstalls apps with their leftovers, and shows disk usage. Everything is moved to the Trash, so it's reversible.",
+  "aboutDescription": "A one-click menubar app that clears caches and developer junk, uninstalls apps with their leftovers, and shows disk usage. Junk is deleted permanently; uninstalled apps are moved to the Trash.",
   "aboutFeatureScan": "Smart Scan: junk by category with a safety rating",
   "aboutFeatureUninstall": "Uninstaller: removes apps with their leftovers in ~/Library",
   "aboutFeatureDisk": "Disk gauge: Finder-accurate usage ring"

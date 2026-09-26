@@ -9,8 +9,9 @@ import 'buttons.dart';
 /// Full-page celebration shown after a clean: count-up of bytes freed,
 /// a glowing check, and a burst of particles.
 class FreedOverlay extends StatefulWidget {
-  const FreedOverlay({super.key, required this.bytes, required this.onDone});
+  const FreedOverlay({super.key, required this.bytes, required this.onDone, this.toTrash = false});
   final int bytes;
+  final bool toTrash;
   final VoidCallback onDone;
 
   @override
@@ -66,7 +67,7 @@ class _FreedOverlayState extends State<FreedOverlay> with SingleTickerProviderSt
                   },
                 ),
                 const SizedBox(height: 6),
-                const Text('moved to Trash', style: TextStyle(fontSize: 14, color: Broom.muted, fontWeight: FontWeight.w500)),
+                Text(widget.toTrash ? 'moved to Trash' : 'permanently deleted', style: TextStyle(fontSize: 14, color: Broom.muted, fontWeight: FontWeight.w500)),
                 const SizedBox(height: 30),
                 GradientButton(label: 'Done', gradient: Broom.successGradient, onPressed: widget.onDone),
               ],
