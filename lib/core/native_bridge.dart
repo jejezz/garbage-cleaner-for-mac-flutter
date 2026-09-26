@@ -11,6 +11,13 @@ class NativeBridge {
     return Map<String, String>.from(r?['failed'] as Map? ?? {});
   }
 
+  /// Permanently deletes paths (bypasses the Trash). `~/.Trash` itself is
+  /// emptied rather than removed. Returns paths that failed with their error.
+  static Future<Map<String, String>> deletePermanently(List<String> paths) async {
+    final r = await _ch.invokeMapMethod<String, dynamic>('deletePermanently', {'paths': paths});
+    return Map<String, String>.from(r?['failed'] as Map? ?? {});
+  }
+
   static Future<bool> hasFullDiskAccess() async =>
       await _ch.invokeMethod<bool>('hasFullDiskAccess') ?? false;
 

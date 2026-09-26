@@ -43,6 +43,33 @@ class NativeBridge {
       }
       result(["trashed": trashed, "failed": failed])
 
+    // Permanently delete files/folders (NOT reversible — bypasses the Trash).
+    // The user's Trash folder itself (~/.Trash) is emptied in place rather
+    // than removed, so Finder keeps a working Trash.
+    // args: { "paths": [String] }  ->  { "deleted": [String], "failed": {path: error} }
+    case "deletePermanently":
+      let paths = args["paths"] as? [String] ?? []
+      let fm = FileManager.default
+      let trashDir = fm.homeDirectoryForCurrentUser.appendingPathComponent(".Trash").standardizedFileURL.path
+      var deleted: [String] = []
+      var failed: [String: String] = [:]
+      for p in paths {
+        let url = URL(fileURLWithPath: p).standardizedFileURL
+        do {
+          if url.path == trashDir {
+            for child in try fm.contentsOfDirectory(at: url, includingPropertiesForKeys: nil) {
+              try fm.removeItem(at: child)
+            }
+          } else {
+            try fm.removeItem(at: url)
+          }
+          deleted.append(p)
+        } catch {
+          failed[p] = error.localizedDescription
+        }
+      }
+      result(["deleted": deleted, "failed": failed])
+
     // Full Disk Access check. TCC has no public API, so the standard trick is
     // to actually open a file that TCC protects. (isReadableFile/access(2)
     // only checks POSIX bits and ignores TCC, so it must be a real open().)

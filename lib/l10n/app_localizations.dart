@@ -143,7 +143,7 @@ abstract class AppLocalizations {
   /// No description provided for @aboutDescription.
   ///
   /// In ko, this message translates to:
-  /// **'메뉴 막대에서 한 번에 캐시와 개발 도구 찌꺼기를 치우고, 앱을 남은 파일까지 함께 지우며, 디스크 사용량을 보여 줍니다. 지운 항목은 모두 휴지통으로 옮기므로 되돌릴 수 있습니다.'**
+  /// **'메뉴 막대에서 한 번에 캐시와 개발 도구 찌꺼기를 치우고, 앱을 남은 파일까지 함께 지우며, 디스크 사용량을 보여 줍니다. 찌꺼기 파일은 휴지통을 거치지 않고 완전히 삭제하며, 제거한 앱은 휴지통으로 옮깁니다.'**
   String get aboutDescription;
 
   /// No description provided for @aboutFeatureScan.

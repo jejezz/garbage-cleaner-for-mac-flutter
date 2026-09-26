@@ -30,7 +30,8 @@
 - **Disk gauge** — Finder-accurate usage ring (purgeable space counts as free) with a live preview of
   how much the current selection would free
 - **Menubar app** — one click to open, no Dock icon, `Hide` to tuck it away
-- **Reversible** — everything is moved to the Trash, never hard-deleted
+- **Permanent junk cleanup** — junk is deleted outright (not moved to the Trash), and selecting
+  the Trash category empties it; uninstalled apps still go to the Trash
 - **Guided setup** — a step-by-step walkthrough for granting Full Disk Access
 
 <p align="center">
@@ -52,7 +53,7 @@ when the banner appears — *Show me how* walks you through it.
 
 Dart drives the UI and all scanning logic; a ~100-line Swift bridge
 ([`NativeBridge.swift`](macos/Runner/NativeBridge.swift)) covers the few things Dart can't do on
-macOS — move to Trash, Full Disk Access check, volume capacity, bundle info, reveal in Finder.
+macOS — permanent delete / move to Trash, Full Disk Access check, volume capacity, bundle info, reveal in Finder.
 
 ## Development
 

@@ -36,7 +36,7 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get aboutDescription =>
-      '메뉴 막대에서 한 번에 캐시와 개발 도구 찌꺼기를 치우고, 앱을 남은 파일까지 함께 지우며, 디스크 사용량을 보여 줍니다. 지운 항목은 모두 휴지통으로 옮기므로 되돌릴 수 있습니다.';
+      '메뉴 막대에서 한 번에 캐시와 개발 도구 찌꺼기를 치우고, 앱을 남은 파일까지 함께 지우며, 디스크 사용량을 보여 줍니다. 찌꺼기 파일은 휴지통을 거치지 않고 완전히 삭제하며, 제거한 앱은 휴지통으로 옮깁니다.';
 
   @override
   String get aboutFeatureScan => '스마트 스캔: 안전 등급과 함께 분류별로 정크 찾기';

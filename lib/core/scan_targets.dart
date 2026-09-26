@@ -65,7 +65,7 @@ const scanTargets = <ScanTarget>[
   ScanTarget(
     id: 'trash',
     title: 'Trash',
-    description: 'Items already in the Trash.',
+    description: 'Items already in the Trash. Cleaning empties the Trash.',
     paths: ['~/.Trash'],
     safety: Safety.review,
     listChildren: false,
