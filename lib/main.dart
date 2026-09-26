@@ -264,7 +264,7 @@ class _ShellState extends State<_Shell> {
                 ],
               ),
               if (state.lastFreed != null)
-                Positioned.fill(child: FreedOverlay(bytes: state.lastFreed!, onDone: state.dismissFreed)),
+                Positioned.fill(child: FreedOverlay(bytes: state.lastFreed!, toTrash: state.lastFreedToTrash, onDone: state.dismissFreed)),
             ],
           ),
         ),

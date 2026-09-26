@@ -36,7 +36,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get aboutDescription =>
-      'A one-click menubar app that clears caches and developer junk, uninstalls apps with their leftovers, and shows disk usage. Everything is moved to the Trash, so it\'s reversible.';
+      'A one-click menubar app that clears caches and developer junk, uninstalls apps with their leftovers, and shows disk usage. Junk is deleted permanently; uninstalled apps are moved to the Trash.';
 
   @override
   String get aboutFeatureScan =>

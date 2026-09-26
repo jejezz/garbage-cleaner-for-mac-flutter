@@ -113,8 +113,8 @@ class JunkPage extends StatelessWidget {
   Future<void> _confirmClean(BuildContext context) async {
     final ok = await showConfirm(
       context,
-      title: 'Move ${formatBytes(state.selectedBytes)} to Trash?',
-      message: '${state.selected.length} items will be moved to the Trash. You can restore them until you empty it.',
+      title: 'Permanently delete ${formatBytes(state.selectedBytes)}?',
+      message: '${state.selected.length} items will be deleted permanently, not moved to the Trash. This cannot be undone.',
       action: 'Clean',
     );
     if (ok) await state.cleanSelected();
