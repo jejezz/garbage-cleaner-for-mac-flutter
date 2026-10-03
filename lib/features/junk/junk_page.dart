@@ -58,6 +58,14 @@ class JunkPage extends StatelessWidget {
             ],
           ),
         ),
+        if (state.unreadablePaths.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.fromLTRB(28, 0, 28, 8),
+            child: Text(
+              "Couldn't read ${state.unreadablePaths.map((p) => p.contains('Mobile Documents') ? 'iCloud Drive Trash' : p.split('/').last).join(', ')} — check Full Disk Access or iCloud Drive. It was skipped.",
+              style: Broom.caption.copyWith(color: Broom.amber),
+            ),
+          ),
         if (state.lastError != null)
           Padding(
             padding: const EdgeInsets.fromLTRB(28, 0, 28, 8),

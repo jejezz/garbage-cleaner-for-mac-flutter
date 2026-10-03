@@ -24,6 +24,9 @@ class AppState extends ChangeNotifier {
   final Set<String> selected = {};
   String? lastError;
 
+  /// Locations the last scan could not read (shown as a notice on the Junk page).
+  List<String> unreadablePaths = [];
+
   int get selectedBytes =>
       junk.where((j) => selected.contains(j.path)).fold(0, (s, j) => s + j.bytes);
   int get totalJunkBytes => junk.fold(0, (s, j) => s + j.bytes);
@@ -47,6 +50,7 @@ class AppState extends ChangeNotifier {
     } catch (e) {
       lastError = '$e';
     } finally {
+      unreadablePaths = List.of(JunkScanner.unreadable);
       scanning = false;
       notifyListeners();
     }
