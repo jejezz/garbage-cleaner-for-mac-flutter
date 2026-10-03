@@ -200,6 +200,11 @@ class _Detail extends StatelessWidget {
           ),
         ]),
       ),
+      if (state.lastError != null)
+        Padding(
+          padding: const EdgeInsets.fromLTRB(24, 0, 24, 8),
+          child: Text(state.lastError!, style: Broom.caption.copyWith(color: Broom.rose)),
+        ),
       Expanded(
         child: ListView(
           padding: const EdgeInsets.fromLTRB(24, 4, 24, 12),
