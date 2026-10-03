@@ -65,8 +65,9 @@ const scanTargets = <ScanTarget>[
   ScanTarget(
     id: 'trash',
     title: 'Trash',
-    description: 'Items already in the Trash. Cleaning empties the Trash.',
-    paths: ['~/.Trash'],
+    description: 'Items already in the Trash (including iCloud Drive). Cleaning empties the Trash.',
+    // iCloud Drive keeps its own trash; Finder merges it into the one you see.
+    paths: ['~/.Trash', '~/Library/Mobile Documents/.Trash'],
     safety: Safety.safe,
     listChildren: false,
   ),
