@@ -17,6 +17,11 @@ class JunkItem {
 /// ~/Library/Caches alone can hold 500k+ files, and `du` is 5–10× faster than
 /// stat()-ing each one from Dart. `du` is part of every macOS install.
 class JunkScanner {
+  /// Scan roots that exist but could not be read during the last [scan]
+  /// (no permission, iCloud not available…). The UI surfaces these instead of
+  /// silently showing nothing.
+  static final List<String> unreadable = [];
+
   /// Scans every target and reports progress as each finishes.
   /// Items are sorted largest-first within the returned list.
   static Stream<List<JunkItem>> scan(List<ScanTarget> targets) async* {
@@ -24,12 +29,21 @@ class JunkScanner {
     // broader one (e.g. ~/Library/Caches/pip is "pip Cache", not "User Caches").
     final claimed = {for (final t in targets) ...t.resolvedPaths};
 
+    unreadable.clear();
     final results = <JunkItem>[];
     for (final target in targets) {
       final paths = <String>[];
       for (final root in target.resolvedPaths) {
         if (!Directory(root).existsSync()) continue;
         if (!target.listChildren) {
+          // Probe first: an unreadable root would otherwise measure as 0 bytes
+          // and vanish from the list without any explanation.
+          try {
+            Directory(root).listSync(followLinks: false);
+          } on FileSystemException {
+            unreadable.add(root);
+            continue;
+          }
           paths.add(root);
           continue;
         }
