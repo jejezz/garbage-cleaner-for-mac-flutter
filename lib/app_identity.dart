@@ -8,7 +8,7 @@ abstract final class AppIdentity {
   /// 표시 이름. 번역하지 않는다 (conventions/localization.md §2).
   static const displayName = 'MacBroom';
 
-  static const repositoryUrl = 'https://github.com/jejezz/garbage-cleaner-for-mac-flutter';
+  static const repositoryUrl = 'https://github.com/jejezz/macbroom-flutter';
 
   static const copyrightHolder = 'Jongyun Ahn';
 

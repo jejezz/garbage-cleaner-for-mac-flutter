@@ -10,11 +10,11 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/jejezz/garbage-cleaner-for-mac/releases/latest"><img src="https://img.shields.io/github/v/release/jejezz/garbage-cleaner-for-mac?style=flat-square&color=7c6cff" alt="Latest release"></a>
-  <a href="https://github.com/jejezz/garbage-cleaner-for-mac/releases"><img src="https://img.shields.io/github/downloads/jejezz/garbage-cleaner-for-mac/total?style=flat-square&color=e961ff" alt="Downloads"></a>
+  <a href="https://github.com/jejezz/macbroom-flutter/releases/latest"><img src="https://img.shields.io/github/v/release/jejezz/macbroom-flutter?style=flat-square&color=7c6cff" alt="Latest release"></a>
+  <a href="https://github.com/jejezz/macbroom-flutter/releases"><img src="https://img.shields.io/github/downloads/jejezz/macbroom-flutter/total?style=flat-square&color=e961ff" alt="Downloads"></a>
   <img src="https://img.shields.io/badge/platform-macOS%2012%2B-34e0ff?style=flat-square" alt="macOS 12+">
   <img src="https://img.shields.io/badge/built%20with-Flutter-3df2b2?style=flat-square" alt="Flutter">
-  <a href="LICENSE"><img src="https://img.shields.io/github/license/jejezz/garbage-cleaner-for-mac?style=flat-square" alt="MIT license"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/github/license/jejezz/macbroom-flutter?style=flat-square" alt="MIT license"></a>
 </p>
 
 <p align="center">
@@ -42,7 +42,7 @@
 ## Install
 
 Download the latest `MacBroom-<version>.dmg` from
-[**Releases**](https://github.com/jejezz/garbage-cleaner-for-mac/releases/latest), open it and drag
+[**Releases**](https://github.com/jejezz/macbroom-flutter/releases/latest), open it and drag
 MacBroom to Applications.
 
 The app is not notarized yet, so on first launch **right-click MacBroom.app → Open → Open** once
