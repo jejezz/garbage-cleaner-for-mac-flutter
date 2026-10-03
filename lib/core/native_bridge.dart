@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/services.dart';
 
 /// Dart side of the Swift bridge (macos/Runner/NativeBridge.swift).
@@ -8,7 +10,24 @@ class NativeBridge {
   /// Moves paths to the Trash. Returns paths that failed with their error.
   static Future<Map<String, String>> moveToTrash(List<String> paths) async {
     final r = await _ch.invokeMapMethod<String, dynamic>('moveToTrash', {'paths': paths});
-    return Map<String, String>.from(r?['failed'] as Map? ?? {});
+    final failed = Map<String, String>.from(r?['failed'] as Map? ?? {});
+    // Root-owned items (e.g. App Store / pkg-installed apps) can't be trashed
+    // by us; Finder can, after asking the user for admin authorization.
+    for (final path in failed.keys.toList()) {
+      if (await _trashViaFinder(path)) failed.remove(path);
+    }
+    return failed;
+  }
+
+  static Future<bool> _trashViaFinder(String path) async {
+    final escaped = path.replaceAll(r'\', r'\\').replaceAll('"', r'\"');
+    try {
+      final r = await Process.run('osascript', ['-e', 'tell application "Finder" to delete POSIX file "$escaped"']);
+      // Trust the filesystem, not the exit code: a cancelled auth must not count as success.
+      return r.exitCode == 0 && FileSystemEntity.typeSync(path, followLinks: false) == FileSystemEntityType.notFound;
+    } on ProcessException {
+      return false;
+    }
   }
 
   /// Permanently deletes paths (bypasses the Trash). `~/.Trash` itself is

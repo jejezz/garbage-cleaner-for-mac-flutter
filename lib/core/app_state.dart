@@ -159,12 +159,16 @@ class AppState extends ChangeNotifier {
     cleaning = true;
     notifyListeners();
     final paths = [...selectedLeftovers, if (removeAppBundle) app.info.path];
-    final freedBefore = uninstallBytes;
+    final bundleBytes = app.bytes;
+    final leftoverBytes = {for (final l in leftovers) l.path: l.bytes};
     final failed = await NativeBridge.moveToTrash(paths);
     lastError = failed.isEmpty ? null : 'Could not remove: ${failed.values.first}';
     cleaning = false;
-    if (failed.isEmpty) {
-      lastFreed = freedBefore;
+    // Only count what really left the disk; celebrate only if something did.
+    final freed = paths.where((x) => !failed.containsKey(x)).fold<int>(
+        0, (s, x) => s + (x == app.info.path ? bundleBytes : leftoverBytes[x] ?? 0));
+    if (freed > 0) {
+      lastFreed = freed;
       lastFreedToTrash = true;
     }
     if (removeAppBundle && !failed.containsKey(app.info.path)) {
