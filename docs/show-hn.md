@@ -6,7 +6,7 @@
 Show HN: MacBroom – an open-source CleanMyMac alternative built with Flutter
 ```
 
-**URL:** https://github.com/jejezz/garbage-cleaner-for-mac
+**URL:** https://github.com/jejezz/macbroom-flutter
 
 **First comment** (HN convention: submit the URL, then post this as the first comment)
 
@@ -16,8 +16,8 @@ three things I actually used CleanMyMac for: clear caches and developer build
 junk, uninstall apps together with their leftovers in ~/Library, and show how
 full the disk is. It's free and MIT-licensed.
 
-Repo: https://github.com/jejezz/garbage-cleaner-for-mac
-Download: https://github.com/jejezz/garbage-cleaner-for-mac/releases/latest
+Repo: https://github.com/jejezz/macbroom-flutter
+Download: https://github.com/jejezz/macbroom-flutter/releases/latest
 
 Why I built it: I'm a Flutter developer and my Mac was carrying ~40 GB of
 Xcode DerivedData, iOS simulators, Gradle and pub caches that CleanMyMac
