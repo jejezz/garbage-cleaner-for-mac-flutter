@@ -112,6 +112,18 @@ class AppState extends ChangeNotifier {
     notifyListeners();
     apps = await AppScanner.listApps();
     loadingApps = false;
+    // Keep the selection pointing at the freshly scanned instance (or clear it).
+    final sel = selectedApp;
+    if (sel != null) {
+      final i = apps.indexWhere((a) => a.info.path == sel.info.path);
+      if (i < 0) {
+        selectedApp = null;
+        leftovers = [];
+        selectedLeftovers.clear();
+      } else {
+        selectedApp = apps[i];
+      }
+    }
     notifyListeners();
   }
 
@@ -166,5 +178,7 @@ class AppState extends ChangeNotifier {
     }
     notifyListeners();
     await refreshDisk();
+    // Re-read /Applications so the list reflects what is really on disk.
+    await loadApps();
   }
 }

@@ -38,6 +38,16 @@ class AppScanner {
         '~/Library/WebKit',
         '~/Library/Cookies',
         '~/Library/LaunchAgents',
+        '~/Library/Preferences/ByHost',
+        '~/Library/Application Scripts',
+        '~/Library/Application Support/CrashReporter',
+        '~/Library/Internet Plug-Ins',
+        '~/Library/PreferencePanes',
+        '~/Library/Services',
+        '~/Library/Receipts',
+        '~/Library/Autosave Information',
+        '~/Library/Metadata/CoreSpotlight',
+        '~/Library/Daemon Containers',
       ].map((d) => d.replaceFirst('~', Platform.environment['HOME'] ?? '')).toList();
 
   static List<FileSystemEntity> _list(String dir) {
@@ -74,6 +84,12 @@ class AppScanner {
   static Future<List<Leftover>> findLeftovers(InstalledApp app) async {
     final id = app.info.bundleId?.toLowerCase();
     final name = app.name.toLowerCase();
+    // Names to look for: display name, bundle file name, and both without spaces.
+    final fileName = p.basenameWithoutExtension(app.info.path).toLowerCase();
+    final names = <String>{
+      for (final n in [name, fileName])
+        if (n.length >= 4) ...[n, n.replaceAll(' ', '')],
+    };
     // com.google.Chrome -> vendor "google", product "chrome". Many apps nest
     // their data as <vendor>/<product> (e.g. Application Support/Google/Chrome).
     final parts = id?.split('.') ?? const [];
@@ -84,7 +100,7 @@ class AppScanner {
     bool matchesApp(String base) {
       final byId = id != null && id.isNotEmpty && base.contains(id);
       // Name match only for names long enough to not be noise ("Go", "IINA"…).
-      final byName = name.length >= 4 && base.contains(name);
+      final byName = names.any(base.contains);
       return byId || byName;
     }
 

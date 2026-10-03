@@ -29,7 +29,8 @@ class _AppsPageState extends State<AppsPage> {
   void initState() {
     super.initState();
     // Defer: notifying listeners synchronously inside initState would fire during build.
-    if (widget.state.apps.isEmpty) Future.microtask(widget.state.loadApps);
+    // Always rescan on entry so the list is never stale.
+    Future.microtask(widget.state.loadApps);
   }
 
   @override
@@ -48,6 +49,10 @@ class _AppsPageState extends State<AppsPage> {
               child: Row(children: [
                 const Expanded(child: Text('Apps', style: Broom.h1)),
                 Text('${state.apps.length}', style: Broom.caption),
+                const SizedBox(width: 6),
+                IconGhostButton(icon: CupertinoIcons.refresh, onPressed: () {
+                  if (!state.loadingApps) state.loadApps();
+                }),
               ]),
             ),
             Padding(
@@ -73,9 +78,24 @@ class _AppsPageState extends State<AppsPage> {
   }
 }
 
-class _SearchField extends StatelessWidget {
+class _SearchField extends StatefulWidget {
   const _SearchField({required this.onChanged});
   final ValueChanged<String> onChanged;
+  @override
+  State<_SearchField> createState() => _SearchFieldState();
+}
+
+class _SearchFieldState extends State<_SearchField> {
+  final _controller = TextEditingController();
+  final _focus = FocusNode();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    _focus.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) => Container(
         height: 32,
@@ -86,12 +106,12 @@ class _SearchField extends StatelessWidget {
           const SizedBox(width: 6),
           Expanded(
             child: EditableText(
-              controller: TextEditingController(),
-              focusNode: FocusNode(),
+              controller: _controller,
+              focusNode: _focus,
               style: Broom.body,
               cursorColor: Broom.violet,
               backgroundCursorColor: Broom.faint,
-              onChanged: onChanged,
+              onChanged: widget.onChanged,
             ),
           ),
         ]),
