@@ -50,16 +50,25 @@ class NativeBridge {
     case "deletePermanently":
       let paths = args["paths"] as? [String] ?? []
       let fm = FileManager.default
-      let trashDir = fm.homeDirectoryForCurrentUser.appendingPathComponent(".Trash").standardizedFileURL.path
+      // Trash folders are emptied in place, never removed (home + iCloud Drive).
+      let home = fm.homeDirectoryForCurrentUser
+      let trashDirs: Set<String> = [
+        home.appendingPathComponent(".Trash").standardizedFileURL.path,
+        home.appendingPathComponent("Library/Mobile Documents/.Trash").standardizedFileURL.path,
+      ]
       var deleted: [String] = []
       var failed: [String: String] = [:]
       for p in paths {
         let url = URL(fileURLWithPath: p).standardizedFileURL
         do {
-          if url.path == trashDir {
+          if trashDirs.contains(url.path) {
+            // Keep going past a child that won't delete, then report it, so one
+            // stubborn item doesn't leave the rest of the Trash behind.
+            var firstError: Error?
             for child in try fm.contentsOfDirectory(at: url, includingPropertiesForKeys: nil) {
-              try fm.removeItem(at: child)
+              do { try fm.removeItem(at: child) } catch { firstError = firstError ?? error }
             }
+            if let e = firstError { throw e }
           } else {
             try fm.removeItem(at: url)
           }

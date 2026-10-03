@@ -10,7 +10,7 @@ class JunkItem {
   final ScanTarget target;
   final String path;
   final int bytes;
-  String get name => p.basename(path);
+  String get name => p.basename(path) == '.Trash' && path.contains('/Mobile Documents/') ? 'iCloud Drive Trash' : p.basename(path) == '.Trash' ? 'Trash' : p.basename(path);
 }
 
 /// Measures scan targets. Uses `du -sk` rather than walking the tree in Dart:

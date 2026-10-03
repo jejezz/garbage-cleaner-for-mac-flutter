@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:ui' show PlatformDispatcher;
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart' show Theme, ThemeMode;
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:macos_ui/macos_ui.dart';
@@ -263,6 +264,23 @@ class _ShellState extends State<_Shell> {
                   ),
                 ],
               ),
+              // Marks a debug build so it isn't mistaken for the installed app.
+              if (kDebugMode)
+                Positioned(
+                  top: 8,
+                  right: 12,
+                  child: IgnorePointer(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: const Color(0x33FFB020),
+                        borderRadius: BorderRadius.circular(6),
+                        border: Border.all(color: const Color(0xAAFFB020)),
+                      ),
+                      child: const Text('DEBUG', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, letterSpacing: 1.2, color: Color(0xFFFFB020), decoration: TextDecoration.none)),
+                    ),
+                  ),
+                ),
               if (state.lastFreed != null)
                 Positioned.fill(child: FreedOverlay(bytes: state.lastFreed!, toTrash: state.lastFreedToTrash, onDone: state.dismissFreed)),
             ],
