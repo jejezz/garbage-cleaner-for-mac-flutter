@@ -22,6 +22,10 @@ class JunkScanner {
   /// silently showing nothing.
   static final List<String> unreadable = [];
 
+  /// Paths `du` was denied inside (TCC / Full Disk Access). Their sizes are
+  /// undercounted and deleting them will likely fail.
+  static final Set<String> restricted = {};
+
   /// Scans every target and reports progress as each finishes.
   /// Items are sorted largest-first within the returned list.
   static Stream<List<JunkItem>> scan(List<ScanTarget> targets) async* {
@@ -30,6 +34,7 @@ class JunkScanner {
     final claimed = {for (final t in targets) ...t.resolvedPaths};
 
     unreadable.clear();
+    restricted.clear();
     final results = <JunkItem>[];
     for (final target in targets) {
       final paths = <String>[];
@@ -54,7 +59,7 @@ class JunkScanner {
             paths.add(child.path);
           }
         } on FileSystemException {
-          // No permission (Full Disk Access not granted) — skip quietly.
+          unreadable.add(root);
         }
       }
       if (paths.isEmpty) continue;
@@ -72,6 +77,11 @@ class JunkScanner {
   /// Runs `du -sk` over [paths]. Returns bytes per path (0 if unreadable).
   static Future<Map<String, int>> _du(List<String> paths) async {
     final r = await Process.run('du', ['-sk', ...paths]);
+    for (final line in (r.stderr as String).split('\n')) {
+      // "du: /Users/x/Library/Caches/foo: Operation not permitted"
+      final m = RegExp(r'^du: (.+): (?:Operation not permitted|Permission denied)$').firstMatch(line);
+      if (m != null) restricted.add(m.group(1)!);
+    }
     final out = <String, int>{for (final p in paths) p: 0};
     for (final line in (r.stdout as String).split('\n')) {
       final tab = line.indexOf('\t');

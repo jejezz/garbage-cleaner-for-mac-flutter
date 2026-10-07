@@ -66,6 +66,19 @@ class JunkPage extends StatelessWidget {
               style: Broom.caption.copyWith(color: Broom.amber),
             ),
           ),
+        if (state.restrictedCount > 0 && state.fullDiskAccess == false)
+          Padding(
+            padding: const EdgeInsets.fromLTRB(28, 0, 28, 8),
+            child: Row(children: [
+              Expanded(
+                child: Text(
+                  'macOS blocked ${state.restrictedCount} location(s), so sizes are understated and some items can\'t be cleaned. Grant Full Disk Access to include them.',
+                  style: Broom.caption.copyWith(color: Broom.amber),
+                ),
+              ),
+              GhostButton(label: 'Open Settings', small: true, onPressed: NativeBridge.openFullDiskAccessSettings),
+            ]),
+          ),
         if (state.lastError != null)
           Padding(
             padding: const EdgeInsets.fromLTRB(28, 0, 28, 8),

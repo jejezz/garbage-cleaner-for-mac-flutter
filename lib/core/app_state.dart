@@ -27,6 +27,9 @@ class AppState extends ChangeNotifier {
   /// Locations the last scan could not read (shown as a notice on the Junk page).
   List<String> unreadablePaths = [];
 
+  /// Number of locations inside scanned folders that macOS denied us.
+  int restrictedCount = 0;
+
   int get selectedBytes =>
       junk.where((j) => selected.contains(j.path)).fold(0, (s, j) => s + j.bytes);
   int get totalJunkBytes => junk.fold(0, (s, j) => s + j.bytes);
@@ -51,6 +54,7 @@ class AppState extends ChangeNotifier {
       lastError = '$e';
     } finally {
       unreadablePaths = List.of(JunkScanner.unreadable);
+      restrictedCount = JunkScanner.restricted.length;
       scanning = false;
       notifyListeners();
     }
@@ -93,7 +97,10 @@ class AppState extends ChangeNotifier {
         .fold(0, (s, j) => s + j.bytes);
     junk = junk.where((j) => !selected.contains(j.path) || failed.containsKey(j.path)).toList();
     selected.retainAll(failed.keys);
-    lastError = failed.isEmpty ? null : 'Could not remove ${failed.length} item(s): ${failed.values.first}';
+    lastError = failed.isEmpty
+        ? null
+        : 'Could not remove ${failed.length} item(s): ${failed.values.first}'
+            '${fullDiskAccess == false ? ' — grant Full Disk Access and try again.' : ''}';
     cleaning = false;
     lastFreed = freed;
     lastFreedToTrash = false;
