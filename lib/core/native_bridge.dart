@@ -34,7 +34,27 @@ class NativeBridge {
   /// emptied rather than removed. Returns paths that failed with their error.
   static Future<Map<String, String>> deletePermanently(List<String> paths) async {
     final r = await _ch.invokeMapMethod<String, dynamic>('deletePermanently', {'paths': paths});
-    return Map<String, String>.from(r?['failed'] as Map? ?? {});
+    final failed = Map<String, String>.from(r?['failed'] as Map? ?? {});
+    // Root-owned leftovers (e.g. an app trashed via Finder after admin auth)
+    // can only be removed by Finder, which asks for authorization itself.
+    final home = Platform.environment['HOME'] ?? '';
+    if (failed.keys.any((p) => p == '$home/.Trash') && await _emptyTrashViaFinder()) {
+      failed.remove('$home/.Trash');
+    }
+    return failed;
+  }
+
+  static Future<bool> _emptyTrashViaFinder() async {
+    try {
+      final r = await Process.run('osascript', ['-e', 'tell application "Finder" to empty the trash']);
+      if (r.exitCode != 0) return false;
+      final dir = Directory('${Platform.environment['HOME']}/.Trash');
+      return dir.listSync().where((e) => !e.path.endsWith('/.DS_Store')).isEmpty;
+    } on FileSystemException {
+      return false;
+    } on ProcessException {
+      return false;
+    }
   }
 
   static Future<bool> hasFullDiskAccess() async =>

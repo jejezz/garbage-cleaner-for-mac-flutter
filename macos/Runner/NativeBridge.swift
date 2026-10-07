@@ -22,6 +22,25 @@ class NativeBridge {
     channel?.invokeMethod("reopen", arguments: nil)
   }
 
+  // removeItem, retried after clearing user-immutable flags and making the
+  // tree writable (apps trashed from /Applications often carry both). Root-owned
+  // items still fail here; Dart falls back to Finder for those.
+  private static func removeForce(_ url: URL) throws {
+    let fm = FileManager.default
+    do { try fm.removeItem(at: url) } catch {
+      for (tool, args) in [("/usr/bin/chflags", ["-R", "nouchg", url.path]),
+                           ("/bin/chmod", ["-R", "u+rwX", url.path])] {
+        let task = Process()
+        task.executableURL = URL(fileURLWithPath: tool)
+        task.arguments = args
+        task.standardError = FileHandle.nullDevice
+        try? task.run()
+        task.waitUntilExit()
+      }
+      try fm.removeItem(at: url)
+    }
+  }
+
   private static func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
     let args = call.arguments as? [String: Any] ?? [:]
 
@@ -66,11 +85,11 @@ class NativeBridge {
             // stubborn item doesn't leave the rest of the Trash behind.
             var firstError: Error?
             for child in try fm.contentsOfDirectory(at: url, includingPropertiesForKeys: nil) {
-              do { try fm.removeItem(at: child) } catch { firstError = firstError ?? error }
+              do { try removeForce(child) } catch { firstError = firstError ?? error }
             }
             if let e = firstError { throw e }
           } else {
-            try fm.removeItem(at: url)
+            try removeForce(url)
           }
           deleted.append(p)
         } catch {
