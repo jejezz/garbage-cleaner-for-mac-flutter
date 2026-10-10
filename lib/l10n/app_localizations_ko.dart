@@ -46,4 +46,116 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get aboutFeatureDisk => '디스크 게이지: Finder와 같은 기준의 사용량 표시';
+
+  @override
+  String get updateCheckMenuItem => '업데이트 확인';
+
+  @override
+  String get updateChecking => '업데이트를 확인하는 중…';
+
+  @override
+  String get updateAvailableTitle => '새 버전이 있습니다';
+
+  @override
+  String updateAvailableBody(String appName, String current, String latest) {
+    return '$appName $latest 버전이 나왔습니다. (현재 $current)';
+  }
+
+  @override
+  String get updateReleaseNotes => '변경 내용';
+
+  @override
+  String get updateNow => '지금 업데이트';
+
+  @override
+  String get updateLater => '나중에';
+
+  @override
+  String get updateSkipVersion => '이 버전 건너뛰기';
+
+  @override
+  String get updateDownloading => '내려받는 중…';
+
+  @override
+  String get updateVerifying => '파일을 확인하는 중…';
+
+  @override
+  String updateDownloadProgress(String received, String total) {
+    return '$received / $total';
+  }
+
+  @override
+  String get updateCancel => '취소';
+
+  @override
+  String get updateFailedTitle => '업데이트하지 못했습니다';
+
+  @override
+  String get updateCheckFailedTitle => '업데이트를 확인하지 못했습니다';
+
+  @override
+  String get updateErrorNetwork =>
+      '업데이트 서버에 연결하지 못했습니다. 인터넷 연결을 확인한 뒤 다시 시도해 주세요.';
+
+  @override
+  String get updateErrorChecksum =>
+      '내려받은 파일이 올바르지 않아 설치하지 않았습니다. 잠시 뒤에 다시 시도해 주세요.';
+
+  @override
+  String get updateErrorInstall => '설치를 시작하지 못했습니다.';
+
+  @override
+  String get updateErrorGeneric =>
+      '업데이트 서버에서 예상하지 못한 응답을 받았습니다. 잠시 뒤에 다시 시도해 주세요.';
+
+  @override
+  String get updateUpToDateTitle => '최신 버전입니다';
+
+  @override
+  String updateUpToDateBody(String version) {
+    return '$version 버전을 사용 중입니다.';
+  }
+
+  @override
+  String get updateUnavailableTitle => '직접 설치해 주세요';
+
+  @override
+  String updateUnavailableBody(String latest) {
+    return '$latest 버전이 있지만 앱에서 자동으로 설치할 수 없습니다. 릴리스 페이지에서 받아 주세요.';
+  }
+
+  @override
+  String get updateOpenReleasePage => '릴리스 페이지 열기';
+
+  @override
+  String get updateMacosOpenedTitle => '설치 창이 열렸습니다';
+
+  @override
+  String updateMacosOpenedBody(String appName) {
+    return '열린 창에서 $appName 을(를) Applications 폴더로 끌어다 놓아 주세요. 실행 중이면 종료한 뒤 덮어쓰세요.';
+  }
+
+  @override
+  String get updateWindowsInstallTitle => '설치 프로그램을 열었습니다';
+
+  @override
+  String updateWindowsInstallBody(String appName) {
+    return '설치하려면 $appName 을(를) 종료해야 합니다. 설치 프로그램의 안내를 따라 주세요.';
+  }
+
+  @override
+  String updateQuitApp(String appName) {
+    return '$appName 종료';
+  }
+
+  @override
+  String get updateLinuxInstallTitle => '설치를 준비했습니다';
+
+  @override
+  String updateLinuxInstallBody(String appName) {
+    return '$appName 을(를) 종료하고 설치합니다. 설치가 끝나면 자동으로 다시 시작됩니다.';
+  }
+
+  @override
+  String get updateQuitAndInstall => '종료하고 설치';
 }

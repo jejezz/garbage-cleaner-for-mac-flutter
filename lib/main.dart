@@ -18,6 +18,8 @@ import 'features/dashboard/dashboard_page.dart';
 import 'features/junk/junk_page.dart';
 import 'l10n/app_localizations.dart';
 import 'theme/broom_theme.dart';
+import 'update/update_scope.dart';
+import 'update/update_service.dart';
 import 'widgets/freed_overlay.dart';
 import 'widgets/nav_rail.dart';
 
@@ -45,12 +47,15 @@ Future<void> main() async {
     },
   );
 
-  await _setUpTray();
+  // Null when UPDATE_SERVER is empty or the platform is unsupported — no update checks.
+  final updates = await UpdateService.create();
+  await _setUpTray(withUpdates: updates != null);
 
-  runApp(const App());
+  // UpdateScope sits above MacosApp so the About dialog adds its "Check for Updates" button.
+  runApp(UpdateScope(service: updates, child: App(updates: updates)));
 }
 
-Future<void> _setUpTray() async {
+Future<void> _setUpTray({required bool withUpdates}) async {
   // The tray menu lives outside the widget tree, so resolve the locale here.
   final l10n = lookupAppLocalizations(
     resolveAppLocale(PlatformDispatcher.instance.locale, AppLocalizations.supportedLocales),
@@ -59,13 +64,17 @@ Future<void> _setUpTray() async {
   await trayManager.setContextMenu(Menu(items: [
     MenuItem(key: 'open', label: 'Open ${AppIdentity.displayName}'),
     MenuItem(key: 'about', label: l10n.aboutMenuItem(AppIdentity.displayName)),
+    if (withUpdates) MenuItem(key: 'update', label: l10n.updateCheckMenuItem),
     MenuItem.separator(),
     MenuItem(key: 'quit', label: 'Quit ${AppIdentity.displayName}'),
   ]));
 }
 
 class App extends StatefulWidget {
-  const App({super.key});
+  const App({super.key, this.updates});
+
+  /// Checks for new versions at startup. Null disables update checks.
+  final UpdateService? updates;
 
   @override
   State<App> createState() => _AppState();
@@ -87,6 +96,7 @@ class _AppState extends State<App> with TrayListener, WindowListener {
     windowManager.addListener(this);
     NativeBridge.onReopen(_onReopen);
     state.refreshDisk();
+    widget.updates?.startAutomaticCheck(_navigatorKey);
   }
 
   @override
@@ -111,6 +121,8 @@ class _AppState extends State<App> with TrayListener, WindowListener {
         _showUnderTray(popover: false);
       case 'about':
         _showAboutFromTray();
+      case 'update':
+        _checkForUpdatesFromTray();
       case 'quit':
         exit(0);
     }
@@ -142,7 +154,7 @@ class _AppState extends State<App> with TrayListener, WindowListener {
   /// position yet, so its bounds would put the window off screen.
   Future<void> _onReopen() async {
     await trayManager.destroy();
-    await _setUpTray();
+    await _setUpTray(withUpdates: widget.updates != null);
     popoverMode = false;
     await windowManager.center();
     await windowManager.show();
@@ -166,6 +178,16 @@ class _AppState extends State<App> with TrayListener, WindowListener {
   Future<void> _showAboutFromTray() async {
     await _showUnderTray(popover: false);
     _showAbout();
+  }
+
+  /// Like About: an LSUIElement app's hidden window can't show a dialog, so
+  /// bring the window up (non-popover, so it doesn't dismiss on blur) first.
+  Future<void> _checkForUpdatesFromTray() async {
+    await _showUnderTray(popover: false);
+    if (!mounted) return;
+    final context = _navigatorKey.currentContext;
+    // ignore: use_build_context_synchronously
+    if (context != null) widget.updates?.checkManually(context);
   }
 
   void _showAbout() {
