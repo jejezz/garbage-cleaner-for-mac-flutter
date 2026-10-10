@@ -123,6 +123,15 @@ jobs:
           path: dist
           merge-multiple: true
 
+      # Computed here (after notarization + stapling, which rewrite the DMG)
+      # so the hashes match exactly what users download. Covers every file in
+      # dist/, so future platform jobs are included automatically.
+      - name: Generate SHA-256 checksums
+        working-directory: dist
+        run: |
+          sha256sum -- * > SHA256SUMS.txt
+          cat SHA256SUMS.txt
+
       - name: Create GitHub Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
