@@ -163,6 +163,192 @@ abstract class AppLocalizations {
   /// In ko, this message translates to:
   /// **'디스크 게이지: Finder와 같은 기준의 사용량 표시'**
   String get aboutFeatureDisk;
+
+  /// No description provided for @updateCheckMenuItem.
+  ///
+  /// In ko, this message translates to:
+  /// **'업데이트 확인'**
+  String get updateCheckMenuItem;
+
+  /// No description provided for @updateChecking.
+  ///
+  /// In ko, this message translates to:
+  /// **'업데이트를 확인하는 중…'**
+  String get updateChecking;
+
+  /// No description provided for @updateAvailableTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'새 버전이 있습니다'**
+  String get updateAvailableTitle;
+
+  /// No description provided for @updateAvailableBody.
+  ///
+  /// In ko, this message translates to:
+  /// **'{appName} {latest} 버전이 나왔습니다. (현재 {current})'**
+  String updateAvailableBody(String appName, String current, String latest);
+
+  /// No description provided for @updateReleaseNotes.
+  ///
+  /// In ko, this message translates to:
+  /// **'변경 내용'**
+  String get updateReleaseNotes;
+
+  /// No description provided for @updateNow.
+  ///
+  /// In ko, this message translates to:
+  /// **'지금 업데이트'**
+  String get updateNow;
+
+  /// No description provided for @updateLater.
+  ///
+  /// In ko, this message translates to:
+  /// **'나중에'**
+  String get updateLater;
+
+  /// No description provided for @updateSkipVersion.
+  ///
+  /// In ko, this message translates to:
+  /// **'이 버전 건너뛰기'**
+  String get updateSkipVersion;
+
+  /// No description provided for @updateDownloading.
+  ///
+  /// In ko, this message translates to:
+  /// **'내려받는 중…'**
+  String get updateDownloading;
+
+  /// No description provided for @updateVerifying.
+  ///
+  /// In ko, this message translates to:
+  /// **'파일을 확인하는 중…'**
+  String get updateVerifying;
+
+  /// No description provided for @updateDownloadProgress.
+  ///
+  /// In ko, this message translates to:
+  /// **'{received} / {total}'**
+  String updateDownloadProgress(String received, String total);
+
+  /// No description provided for @updateCancel.
+  ///
+  /// In ko, this message translates to:
+  /// **'취소'**
+  String get updateCancel;
+
+  /// No description provided for @updateFailedTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'업데이트하지 못했습니다'**
+  String get updateFailedTitle;
+
+  /// No description provided for @updateCheckFailedTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'업데이트를 확인하지 못했습니다'**
+  String get updateCheckFailedTitle;
+
+  /// No description provided for @updateErrorNetwork.
+  ///
+  /// In ko, this message translates to:
+  /// **'업데이트 서버에 연결하지 못했습니다. 인터넷 연결을 확인한 뒤 다시 시도해 주세요.'**
+  String get updateErrorNetwork;
+
+  /// No description provided for @updateErrorChecksum.
+  ///
+  /// In ko, this message translates to:
+  /// **'내려받은 파일이 올바르지 않아 설치하지 않았습니다. 잠시 뒤에 다시 시도해 주세요.'**
+  String get updateErrorChecksum;
+
+  /// No description provided for @updateErrorInstall.
+  ///
+  /// In ko, this message translates to:
+  /// **'설치를 시작하지 못했습니다.'**
+  String get updateErrorInstall;
+
+  /// No description provided for @updateErrorGeneric.
+  ///
+  /// In ko, this message translates to:
+  /// **'업데이트 서버에서 예상하지 못한 응답을 받았습니다. 잠시 뒤에 다시 시도해 주세요.'**
+  String get updateErrorGeneric;
+
+  /// No description provided for @updateUpToDateTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'최신 버전입니다'**
+  String get updateUpToDateTitle;
+
+  /// No description provided for @updateUpToDateBody.
+  ///
+  /// In ko, this message translates to:
+  /// **'{version} 버전을 사용 중입니다.'**
+  String updateUpToDateBody(String version);
+
+  /// No description provided for @updateUnavailableTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'직접 설치해 주세요'**
+  String get updateUnavailableTitle;
+
+  /// No description provided for @updateUnavailableBody.
+  ///
+  /// In ko, this message translates to:
+  /// **'{latest} 버전이 있지만 앱에서 자동으로 설치할 수 없습니다. 릴리스 페이지에서 받아 주세요.'**
+  String updateUnavailableBody(String latest);
+
+  /// No description provided for @updateOpenReleasePage.
+  ///
+  /// In ko, this message translates to:
+  /// **'릴리스 페이지 열기'**
+  String get updateOpenReleasePage;
+
+  /// No description provided for @updateMacosOpenedTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'설치 창이 열렸습니다'**
+  String get updateMacosOpenedTitle;
+
+  /// No description provided for @updateMacosOpenedBody.
+  ///
+  /// In ko, this message translates to:
+  /// **'열린 창에서 {appName} 을(를) Applications 폴더로 끌어다 놓아 주세요. 실행 중이면 종료한 뒤 덮어쓰세요.'**
+  String updateMacosOpenedBody(String appName);
+
+  /// No description provided for @updateWindowsInstallTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'설치 프로그램을 열었습니다'**
+  String get updateWindowsInstallTitle;
+
+  /// No description provided for @updateWindowsInstallBody.
+  ///
+  /// In ko, this message translates to:
+  /// **'설치하려면 {appName} 을(를) 종료해야 합니다. 설치 프로그램의 안내를 따라 주세요.'**
+  String updateWindowsInstallBody(String appName);
+
+  /// No description provided for @updateQuitApp.
+  ///
+  /// In ko, this message translates to:
+  /// **'{appName} 종료'**
+  String updateQuitApp(String appName);
+
+  /// No description provided for @updateLinuxInstallTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'설치를 준비했습니다'**
+  String get updateLinuxInstallTitle;
+
+  /// No description provided for @updateLinuxInstallBody.
+  ///
+  /// In ko, this message translates to:
+  /// **'{appName} 을(를) 종료하고 설치합니다. 설치가 끝나면 자동으로 다시 시작됩니다.'**
+  String updateLinuxInstallBody(String appName);
+
+  /// No description provided for @updateQuitAndInstall.
+  ///
+  /// In ko, this message translates to:
+  /// **'종료하고 설치'**
+  String get updateQuitAndInstall;
 }
 
 class _AppLocalizationsDelegate
